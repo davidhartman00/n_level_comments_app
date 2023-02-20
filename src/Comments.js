@@ -7,7 +7,7 @@ const CommentObj = function (id, hasParent = false, hasChildren = false, parentI
 		console.error("Error creating CommentObj");
 		throw Error
 	}
-	// TODO: Other Error checks here
+
 	this.id = id;
 	this.hasParent = hasParent;
 	this.hasChildren = hasChildren;
@@ -18,19 +18,6 @@ const CommentObj = function (id, hasParent = false, hasChildren = false, parentI
 }
 
 const HandleDelete = function(commentObj, objId) {
-	console.log("OBJID", objId);
-	const filteredObj = commentObj.filter((ele) =>{
-			if (ele.childComments.length > 0 ) {
-				// *** example *** ele.childrenIds ==> [1,2,3]
-				// *** example *** ele.childComments ==> [{},{},{}]
-				ele.childComments = HandleDelete(ele.childComments, objId)
-			}
-			return ele.id !== objId;
-	})
-	return filteredObj;
-}
-
-const HandleEdit = function(commentObj, objId) {
 	console.log("OBJID", objId);
 	const filteredObj = commentObj.filter((ele) =>{
 			if (ele.childComments.length > 0 ) {
@@ -65,32 +52,11 @@ const commentReducer = (state, action) => {
 				);
 			// Return the updated state
 			return { "showComments": true, "showInput": [], "comments": comments, "counter": ++counter }
-		// case 'REPLY_COMMENT_OLD':
-		// 	// >>>> TODO: This code works for app that does not pull text from input box
-		// 	const parentObj = action.payload
-		// 	const newReplyText =
-		// 		new CommentObj(
-		// 				counter + 1,
-		// 				true,
-		// 				false,
-		// 				parentObj.id,
-		// 				[],
-		// 				"This is a string"
-		// 				)
-		// 			// TODO: add input for edits and comments
-		// 		parentObj.hasChildren = true;
-		// 		parentObj.childComments.push(newReplyText)
-		// 	// >>>> TODO: Temp Test COde END
-		// 	return { "showComments": true, "showInput": [action.payload], "comments": comments, "counter": ++counter }
 		case 'REPLY_COMMENT_KEY':
 			return { "showComments": true, "showInput": [action.payload, false], "comments": comments, "counter": counter }
 		case 'REPLY_COMMENT':
-			// const parentComment = action.payload;
 			const parentComment = action.payload[1];
 			parentComment.childComments =  Object.values(parentComment.childComments);
-			// console.log( "REPLY_COMMENT - type of",typeof parentComment);
-			// console.log( "REPLY_COMMENT - the object", parentComment);
-// >>>
 			const newReply =
 					new CommentObj(
 							counter + 1,
@@ -100,29 +66,22 @@ const commentReducer = (state, action) => {
 							[],
 							action.payload[0]
 							)
-							// TODO: add input for edits and comments
 			parentComment.hasChildren = true;
 			if (!parentComment.childrenIds.includes(newReply.id)){
 				parentComment.childrenIds.push(newReply.id);
-				// console.log("parentComment - parent", typeof parentComment);
-				// console.log("parentComment - parent.childComments", typeof parentComment.childComments);
-				// console.log("parentComment - TRUE parent.childComments", parentComment.childComments);
 				parentComment.childComments.push(newReply);
 			}
 			return { "showComments": true,  "showInput": [], "comments": comments, "counter": ++counter }
 		case 'EDIT_COMMENT_KEY':
-			// const commentsWithoutDeleted = state.comments.filter(comment => comment.id != action.payload);
 			// // Return updated state
 			return { "showComments": true, "showInput": [action.payload, true], "comments": comments, "counter": counter }
 		case 'EDIT_COMMENT':
 			console.log("EDIT KEY CLICKED");
 			const editComment = action.payload[1];
 			editComment.text = action.payload[0];
-			// const commentsWithoutDeleted = state.comments.filter(comment => comment.id != action.payload);
 			// // Return updated state
 			return { "showComments": true,  "showInput": [], "comments": comments, "counter": counter }
 		case 'REMOVE_COMMENT':
-			// const commentsWithoutDeleted = state.comments.filter(comment => comment.id != action.payload);
 			const commentsKept = HandleDelete(comments, action.payload)
 			return { "showComments": true,  "showInput": [], "comments": commentsKept, "counter": counter }
 		default:
@@ -130,24 +89,6 @@ const commentReducer = (state, action) => {
 			throw new Error();
 	}
 }
-
-// >>>>>>>>>>>>>>
-// const childrenOfComment = function (parentComment, comments){
-// 	// return array of objs of the children comments
-// 	// to be used when we know there are children comments
-// 	console.log("INSIDE childrenOfComment", parentComment, comments);
-// 	if (parentComment.childrenIds.length == 0) {throw Error}
-
-// 	const childrenArray= []
-// 	parentComment.childrenIds.forEach(idx => {
-// 		console.log("START childrenArray", childrenArray);
-// 		childrenArray.push(comments[idx-1])
-// 		console.log("2ND childrenArray", childrenArray);
-
-// 	});
-// 	return childrenArray
-// }
-// >>>>>>>>>>>>>>
 
 const Comments = ({ comments }) => {
 
@@ -204,17 +145,5 @@ const Comments = ({ comments }) => {
 		</>)
 	}
 }
-
-
-// *** Have an Array with all data
-// *** some have no parent & no children - these we print
-// *** some have children - these we combine and then print
-// *** some have siblings - ?? what do we need to do with these ??
-
-// Structure ___________________
-//			|	box				| 
-//			|___________ 		|
-//			|	within	|		| 
-//			|___________|	box	|
 
 export default Comments;
