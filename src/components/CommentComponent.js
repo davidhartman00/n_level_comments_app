@@ -6,19 +6,23 @@ import Comments from './../Comments';
 
 const CommentComponent = ({commentItem, dispatch, showInput, handleReplyKeyUp, handleEditKeyUp}) => {
 	const showInputBox = (showInput.length > 0 && showInput[0].id === commentItem.id)
+	const showEditInput = (showInput[1])
 	// console.log("showInputBox YO LOOK HERE", showInput);
 	return(
 		<div key={commentItem.id} className="comment">
 			<div className="comment-text">{commentItem.text}</div>
 			<div>
 				<div className="comment-action-btn" onClick={() => dispatch({ type: "REPLY_COMMENT_KEY", payload: commentItem})}>Reply</div>
-				<div className="comment-action-btn" data-edit={true} onClick={() => dispatch({ type: "EDIT_COMMENT_KEY", payload: commentItem})}>Edit</div>
+				<div className="comment-action-btn" onClick={() => dispatch({ type: "EDIT_COMMENT_KEY", payload: commentItem})}>Edit</div>
 				<div className="comment-action-btn" onClick={() => dispatch({ type: "REMOVE_COMMENT", payload: commentItem.id})}>Delete</div>
 			</div>
 			{ showInputBox && 
 				<div className="comment-new">
-					<input className="comment-new-input" type="text" placeholder="Enter Your Reply" onKeyUp={handleReplyKeyUp(commentItem)}/>
-					<input className="comment-new-input" type="text" placeholder={commentItem.text} onKeyUp={handleEditKeyUp(commentItem)}/>
+					{showEditInput ? 
+						<input className="comment-new-input" type="text" value={commentItem.text} onKeyUp={handleEditKeyUp(commentItem)}/>
+						:
+						<input className="comment-new-input" type="text" placeholder="Enter Your Reply" onKeyUp={handleReplyKeyUp(commentItem)}/>
+					}
 				</div>
 			}
 			{commentItem.hasChildren &&

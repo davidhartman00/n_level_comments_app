@@ -73,7 +73,7 @@ const commentReducer = (state, action) => {
 		// 	// >>>> TODO: Temp Test COde END
 		// 	return { "showComments": true, "showInput": [action.payload], "comments": comments, "counter": ++counter }
 		case 'REPLY_COMMENT_KEY':
-			return { "showComments": true, "showInput": [action.payload], "comments": comments, "counter": counter }
+			return { "showComments": true, "showInput": [action.payload, false], "comments": comments, "counter": counter }
 		case 'REPLY_COMMENT':
 			// const parentComment = action.payload;
 			const parentComment = action.payload[1];
@@ -103,7 +103,7 @@ const commentReducer = (state, action) => {
 		case 'EDIT_COMMENT_KEY':
 			// const commentsWithoutDeleted = state.comments.filter(comment => comment.id != action.payload);
 			// // Return updated state
-			return { "showComments": true, "showInput": [action.payload], "comments": comments, "counter": counter }
+			return { "showComments": true, "showInput": [action.payload, true], "comments": comments, "counter": counter }
 		case 'EDIT_COMMENT':
 			console.log("EDIT KEY CLICKED");
 			// const commentsWithoutDeleted = state.comments.filter(comment => comment.id != action.payload);
