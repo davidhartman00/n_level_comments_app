@@ -1,6 +1,5 @@
 import React, { useReducer, useState, useCallback } from 'react'
 import CommentComponent from './components/CommentComponent'
-import SingleComment from './components/SingleComment'
 
 const CommentObj = function (id, hasParent = false, hasChildren = false, parentId = "", childrenIds = [], text = "", childComments = [] ){
 	if (typeof text != "string" || text.length === 0) {
@@ -18,7 +17,6 @@ const CommentObj = function (id, hasParent = false, hasChildren = false, parentI
 }
 
 const HandleDelete = function(commentObj, objId) {
-	console.log("OBJID", objId);
 	const filteredObj = commentObj.filter((ele) =>{
 			if (ele.childComments.length > 0 ) {
 				// *** example *** ele.childrenIds ==> [1,2,3]
@@ -73,13 +71,10 @@ const commentReducer = (state, action) => {
 			}
 			return { "showComments": true,  "showInput": [], "comments": comments, "counter": ++counter }
 		case 'EDIT_COMMENT_KEY':
-			// // Return updated state
 			return { "showComments": true, "showInput": [action.payload, true], "comments": comments, "counter": counter }
 		case 'EDIT_COMMENT':
-			console.log("EDIT KEY CLICKED");
 			const editComment = action.payload[1];
 			editComment.text = action.payload[0];
-			// // Return updated state
 			return { "showComments": true,  "showInput": [], "comments": comments, "counter": counter }
 		case 'REMOVE_COMMENT':
 			const commentsKept = HandleDelete(comments, action.payload)
@@ -95,7 +90,6 @@ const Comments = ({ comments }) => {
 	const [state, dispatch] = useReducer(commentReducer, { "showComments": false,  "showInput": [], "comments": comments, "counter": 2 })
 
 	const handleCommentKeyUp = (ev) => {
-		// Press enter key
 		if(ev.code == "Enter"){
 			if (ev.currentTarget.value == 0) return
 			dispatch({type: "ADD_COMMENT", payload:ev.currentTarget.value})

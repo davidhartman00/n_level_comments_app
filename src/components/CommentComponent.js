@@ -1,13 +1,8 @@
-//  TODO: clean up**
-// import React, { useReducer } from 'react'
-import Comments from './../Comments';
-
-
 
 const CommentComponent = ({commentItem, dispatch, showInput, handleReplyKeyUp, handleEditKeyUp}) => {
 	const showInputBox = (showInput.length > 0 && showInput[0].id === commentItem.id)
 	const showEditInput = (showInput[1])
-	// console.log("showInputBox YO LOOK HERE", showInput);
+
 	return(
 		<div key={commentItem.id} className="comment">
 			<div className="comment-text">{commentItem.text}</div>
@@ -19,7 +14,7 @@ const CommentComponent = ({commentItem, dispatch, showInput, handleReplyKeyUp, h
 			{ showInputBox && 
 				<div className="comment-new">
 					{showEditInput ? 
-						<input className="comment-new-input" type="text" value={commentItem.text} onKeyUp={handleEditKeyUp(commentItem)}/>
+						<input className="comment-new-input" type="text" defaultValue={commentItem.text} onKeyUp={handleEditKeyUp(commentItem)}/>
 						:
 						<input className="comment-new-input" type="text" placeholder="Enter Your Reply" onKeyUp={handleReplyKeyUp(commentItem)}/>
 					}
@@ -35,6 +30,5 @@ const CommentComponent = ({commentItem, dispatch, showInput, handleReplyKeyUp, h
 		</div>
 	)
 }
-
 
 export default CommentComponent;
