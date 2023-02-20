@@ -3,9 +3,6 @@ import CommentComponent from './components/CommentComponent'
 import SingleComment from './components/SingleComment'
 
 const CommentObj = function (id, hasParent = false, hasChildren = false, parentId = "", childrenIds = [], text = "", childComments = [] ){
-	// for (var i = 0, j = arguments.length; i < j; i++){
-	//		console.log("ARGUMENTS CommentObj", arguments[i]);
-	// }
 	if (typeof text != "string" || text.length === 0) {
 		console.error("Error creating CommentObj");
 		throw Error
@@ -21,6 +18,19 @@ const CommentObj = function (id, hasParent = false, hasChildren = false, parentI
 }
 
 const HandleDelete = function(commentObj, objId) {
+	console.log("OBJID", objId);
+	const filteredObj = commentObj.filter((ele) =>{
+			if (ele.childComments.length > 0 ) {
+				// *** example *** ele.childrenIds ==> [1,2,3]
+				// *** example *** ele.childComments ==> [{},{},{}]
+				ele.childComments = HandleDelete(ele.childComments, objId)
+			}
+			return ele.id !== objId;
+	})
+	return filteredObj;
+}
+
+const HandleEdit = function(commentObj, objId) {
 	console.log("OBJID", objId);
 	const filteredObj = commentObj.filter((ele) =>{
 			if (ele.childComments.length > 0 ) {
@@ -77,7 +87,7 @@ const commentReducer = (state, action) => {
 		case 'REPLY_COMMENT':
 			// const parentComment = action.payload;
 			const parentComment = action.payload[1];
-			parentComment.childComments =  Object.values(parentComment.childComments); /* test this line */
+			parentComment.childComments =  Object.values(parentComment.childComments);
 			// console.log( "REPLY_COMMENT - type of",typeof parentComment);
 			// console.log( "REPLY_COMMENT - the object", parentComment);
 // >>>
@@ -97,7 +107,7 @@ const commentReducer = (state, action) => {
 				// console.log("parentComment - parent", typeof parentComment);
 				// console.log("parentComment - parent.childComments", typeof parentComment.childComments);
 				// console.log("parentComment - TRUE parent.childComments", parentComment.childComments);
-				parentComment.childComments.push(newReply); /* TODO: Things seam to fail here on this line. I can fon figure why */
+				parentComment.childComments.push(newReply);
 			}
 			return { "showComments": true,  "showInput": [], "comments": comments, "counter": ++counter }
 		case 'EDIT_COMMENT_KEY':
@@ -106,6 +116,8 @@ const commentReducer = (state, action) => {
 			return { "showComments": true, "showInput": [action.payload, true], "comments": comments, "counter": counter }
 		case 'EDIT_COMMENT':
 			console.log("EDIT KEY CLICKED");
+			const editComment = action.payload[1];
+			editComment.text = action.payload[0];
 			// const commentsWithoutDeleted = state.comments.filter(comment => comment.id != action.payload);
 			// // Return updated state
 			return { "showComments": true,  "showInput": [], "comments": comments, "counter": counter }
@@ -150,15 +162,16 @@ const Comments = ({ comments }) => {
 		}
 	};
 
-	const handleEditKeyUp = (ev) => { /*TODO: This code works only when we are not returning the text from the input box */
-		// Press enter key
-		// if(ev.code == "Enter"){
-		// 	dispatch({type: "REPLY_COMMENT", payload:ev.currentTarget.value})
-		// 	ev.currentTarget.value = ""
-		// }
-	};
+	const handleEditKeyUp = useCallback((commentItem) => { /* TODO: Combine handleEdit with handleReply into on function */
+		return (ev) => {
+			if(ev.code == "Enter"){
+				if (ev.currentTarget.value == 0) return
+				dispatch({type: "EDIT_COMMENT", payload:[ev.currentTarget.value,commentItem]})
+			}
+		}
+	},[comments])
 
-	const handleReplyKeyUp = useCallback((commentItem) => { /* TODO: This is for if we can get the input text back to the state with the object using a callBack function */
+	const handleReplyKeyUp = useCallback((commentItem) => { /* TODO: Combine handleEdit with handleReply into on function */
 		return (ev) => {
 			if(ev.code == "Enter"){
 				if (ev.currentTarget.value == 0) return
@@ -167,18 +180,6 @@ const Comments = ({ comments }) => {
 		}
 	},[comments])
 
-	// >>>>>> TODO: This code may be junk code. Delete if we don't use it.
-	// const collectChildren = (comments)=> {comments.map( (commentItem, idx, comments) => {
-	// 		if (commentItem.hasChildren){
-	// 			let theChildren = childrenOfComment(commentItem, comments)
-	// 			console.log("The Children", theChildren)
-	// 			}
-	// 		}
-	// )}
-	// let something = collectChildren(state.comments);
-	// console.log("SOMETHING", something);
-
-	// >>>>>>
 	if (!state.showComments) {
 		return (
 			<div>
@@ -188,13 +189,6 @@ const Comments = ({ comments }) => {
 		)
 	} else {
 
-		// const displayArray = [];???
-		// state.comments.forEach(displayItem => {
-		// 	if (!displayItem.hasChildren) {
-				
-		// 	}
-
-		// }
 		return(<>
 			
 			<h1>Comments</h1>
