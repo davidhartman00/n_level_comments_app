@@ -22,7 +22,6 @@ const CommentObj = function (id, hasParent = false, hasChildren = false, parentI
 
 const HandleDelete = function(commentObj, objId) {
 	console.log("OBJID", objId);
-	// *** exe *** [{},{},{}]
 	const filteredObj = commentObj.filter((ele) =>{
 			if (ele.childComments.length > 0 ) {
 				// *** example *** ele.childrenIds ==> [1,2,3]
@@ -145,6 +144,7 @@ const Comments = ({ comments }) => {
 	const handleCommentKeyUp = (ev) => {
 		// Press enter key
 		if(ev.code == "Enter"){
+			if (ev.currentTarget.value == 0) return
 			dispatch({type: "ADD_COMMENT", payload:ev.currentTarget.value})
 			ev.currentTarget.value = ""
 		}
@@ -161,6 +161,7 @@ const Comments = ({ comments }) => {
 	const handleReplyKeyUp = useCallback((commentItem) => { /* TODO: This is for if we can get the input text back to the state with the object using a callBack function */
 		return (ev) => {
 			if(ev.code == "Enter"){
+				if (ev.currentTarget.value == 0) return
 				dispatch({type: "REPLY_COMMENT", payload:[ev.currentTarget.value,commentItem]})
 			}
 		}
