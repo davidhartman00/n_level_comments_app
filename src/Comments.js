@@ -16,8 +16,8 @@ const CommentObj = function (id, hasParent = false, hasChildren = false, parentI
 	this.childComments = childComments;
 }
 
-const HandleDelete = function(commentObj, objId) {
-	const filteredObj = commentObj.filter((ele) =>{
+const HandleDelete = function(commentsObj, objId) {
+	const filteredObj = commentsObj.filter((ele) =>{
 			if (ele.childComments.length > 0 ) {
 				// *** example *** ele.childrenIds ==> [1,2,3]
 				// *** example *** ele.childComments ==> [{},{},{}]
