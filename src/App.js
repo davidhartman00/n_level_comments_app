@@ -24,7 +24,9 @@ function App() {
 		]
 
 	return (
-		<Comments comments={initialComments} />
+		<div className='container'>
+			<Comments comments={initialComments} />
+		</div>
 	);
 }
 

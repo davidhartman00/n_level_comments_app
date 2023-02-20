@@ -2,6 +2,7 @@ import React, { useReducer, useState, useCallback } from 'react'
 import CommentComponent from './components/CommentComponent'
 
 const CommentObj = function (id, hasParent = false, hasChildren = false, parentId = "", childrenIds = [], text = "", childComments = [] ){
+	// Function used to create comment object
 	if (typeof text != "string" || text.length === 0) {
 		console.error("Error creating CommentObj");
 		throw Error
@@ -17,10 +18,9 @@ const CommentObj = function (id, hasParent = false, hasChildren = false, parentI
 }
 
 const HandleDelete = (commentsObj, objId) => {
+	// function used to delete the comment
 	const filteredObj = commentsObj.filter((ele) =>{
 			if (ele.childComments.length > 0 ) {
-				// *** example *** ele.childrenIds ==> [1,2,3]
-				// *** example *** ele.childComments ==> [{},{},{}]
 				ele.childComments = HandleDelete(ele.childComments, objId)
 			}
 			return ele.id !== objId;
@@ -29,15 +29,15 @@ const HandleDelete = (commentsObj, objId) => {
 }
 
 const commentReducer = (state, action) => {
+	// Reducer that handle the actions of the app
 	const comments = [...state.comments];
 	let counter = state.counter;
 	switch (action.type) {
 		case 'COMMENTS_LOADED':
-			// Update the comments with the new payload
+			// Load comment for first time
 			return { "showComments": true, "showInput": [], "comments": state.comments, "counter": counter }
 		case 'ADD_COMMENT':
-			// Copy the current states' comments
-			// Push the new comment from the payload
+			// Add a new comment
 			comments.push(
 				new CommentObj(
 						counter + 1,
@@ -48,11 +48,12 @@ const commentReducer = (state, action) => {
 						action.payload
 					)
 				);
-			// Return the updated state
 			return { "showComments": true, "showInput": [], "comments": comments, "counter": ++counter }
 		case 'REPLY_COMMENT_KEY':
+			// Reply key is clicked update the reducer state
 			return { "showComments": true, "showInput": [action.payload, false], "comments": comments, "counter": counter }
 		case 'REPLY_COMMENT':
+			// Add a reply to a comment
 			const parentComment = action.payload[1];
 			parentComment.childComments =  Object.values(parentComment.childComments);
 			const newReply =
@@ -71,14 +72,17 @@ const commentReducer = (state, action) => {
 			}
 			return { "showComments": true,  "showInput": [], "comments": comments, "counter": ++counter }
 		case 'EDIT_COMMENT_KEY':
+			// Edit key is clicked update the reducer state
 			return { "showComments": true, "showInput": [action.payload, true], "comments": comments, "counter": counter }
 		case 'EDIT_COMMENT':
+			// Edit an existing comment
 			const editComment = action.payload[1];
 			editComment.text = action.payload[0];
 			return { "showComments": true,  "showInput": [], "comments": comments, "counter": counter }
 		case 'REMOVE_COMMENT':
+			// Call the functionality for deleting a comment and it's children
 			const commentsKept = HandleDelete(comments, action.payload)
-			return { "showComments": true,  "showInput": [], "comments": commentsKept, "counter": counter }
+			return { "showComments": true, "showInput": [], "comments": commentsKept, "counter": counter }
 		default:
 			console.error(`did not find ${action.type}`);
 			throw new Error();
@@ -86,10 +90,10 @@ const commentReducer = (state, action) => {
 }
 
 const Comments = ({ comments }) => {
-
 	const [state, dispatch] = useReducer(commentReducer, { "showComments": false,  "showInput": [], "comments": comments, "counter": 2 })
 
 	const handleCommentKeyUp = (ev) => {
+		// handler for the add comment action
 		if(ev.code == "Enter"){
 			if (ev.currentTarget.value == 0) return
 			dispatch({type: "ADD_COMMENT", payload:ev.currentTarget.value})
@@ -98,6 +102,7 @@ const Comments = ({ comments }) => {
 	};
 
 	const handleEditKeyUp = useCallback((commentItem) => { /* TODO: Combine handleEdit with handleReply into on function */
+		// handler for the edit comment action
 		return (ev) => {
 			if(ev.code == "Enter"){
 				if (ev.currentTarget.value == 0) return
@@ -107,6 +112,7 @@ const Comments = ({ comments }) => {
 	},[comments])
 
 	const handleReplyKeyUp = useCallback((commentItem) => { /* TODO: Combine handleEdit with handleReply into on function */
+		// handler for the reply comment action
 		return (ev) => {
 			if(ev.code == "Enter"){
 				if (ev.currentTarget.value == 0) return
