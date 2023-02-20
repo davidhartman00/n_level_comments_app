@@ -1,25 +1,31 @@
-import logo from './logo.svg';
 import './App.css';
+import Comments from './Comments';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+	const initialComments = [
+			{
+				id: 1,
+				hasParent: false,
+				hasChildren: false,
+				parentId:0,
+				childrenIds: [],
+				text: "Opportunities don't happen, you create them.",
+				childComments:[]
+			},{
+				id: 2,
+				hasParent: false,
+				hasChildren: false,
+				parentId:0,
+				childrenIds: [],
+				text: "Just one small positive thought in the morning can change your whole day.",
+				childComments:[]
+			}
+		]
+
+	return (
+		<Comments comments={initialComments} />
+	);
 }
 
 export default App;
